@@ -1,0 +1,7 @@
+{
+  "name": "estoque",
+  "private": true,
+  "scripts": {
+    "dev": "bash dev.sh"
+  }
+}
