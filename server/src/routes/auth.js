@@ -1,12 +1,24 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { rateLimit } from 'express-rate-limit';
 import { prisma } from '../db.js';
 import { autenticar } from '../middleware/auth.js';
 
 const router = Router();
 
-router.post('/login', async (req, res) => {
+// Trava tentativas de força bruta no login: 10 tentativas por IP a cada 15min.
+// Conta só respostas de erro (login errado) — um login certo não consome a cota.
+const limiteLogin = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  message: { erro: 'Muitas tentativas de login. Aguarde alguns minutos e tente de novo.' },
+});
+
+router.post('/login', limiteLogin, async (req, res) => {
   const { email, senha } = req.body ?? {};
   if (!email || !senha) return res.status(400).json({ erro: 'Informe e-mail e senha' });
 
