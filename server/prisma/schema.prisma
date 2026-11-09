@@ -3,32 +3,33 @@ generator client {
 }
 
 datasource db {
-  // Troque para "postgresql", "mysql" ou "sqlserver" e ajuste DATABASE_URL no .env
-  provider = "sqlite"
+  // Alterado para PostgreSQL
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Usuario {
-  id            Int             @id @default(autoincrement())
+  id            Int            @id @default(autoincrement())
   nome          String
-  email         String          @unique
+  email         String         @unique
   senhaHash     String
-  perfil        String          @default("padrao") // "admin" | "padrao"
-  ativo         Boolean         @default(true)
-  criadoEm      DateTime        @default(now())
+  perfil        String         @default("padrao") // "admin" | "padrao"
+  ativo         Boolean        @default(true)
+  criadoEm      DateTime       @default(now())
   movimentacoes Movimentacao[]
 }
 
 model Produto {
-  id            Int             @id @default(autoincrement())
+  id            Int            @id @default(autoincrement())
   nome          String
-  sku           String          @unique
+  sku           String         @unique
   categoria     String?
-  quantidade    Int             @default(0)
-  minimo        Int             @default(0)
-  preco         Decimal         @default(0)
-  criadoEm      DateTime        @default(now())
-  atualizadoEm  DateTime        @updatedAt
+  quantidade    Int            @default(0)
+  minimo        Int            @default(0)
+  preco         Decimal        @default(0)
+  criadoEm      DateTime       @default(now())
+  atualizadoEm  DateTime       @updatedAt
   movimentacoes Movimentacao[]
 }
 
