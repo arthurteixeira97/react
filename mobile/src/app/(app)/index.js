@@ -41,6 +41,11 @@ export default function Produtos() {
     `${p.nome} ${p.sku} ${p.categoria ?? ''}`.toLowerCase().includes(busca.toLowerCase())
   );
 
+  const valorTotalEstoque = produtos.reduce(
+    (total, p) => total + (Number(p.quantidade) * Number(p.preco)),
+    0
+  );
+
   function abrirForm(p) {
     setErro('');
     setForm(p
@@ -115,6 +120,16 @@ export default function Produtos() {
         onRefresh={carregar}
         contentContainerStyle={{ padding: 12, gap: 10 }}
         ListEmptyComponent={!atualizando && <Vazio texto="Nenhum produto" />}
+        ListFooterComponent={
+          isAdmin && produtos.length > 0 ? (
+            <View style={s.resumo}>
+              <Text style={s.resumoLabel}>VALOR TOTAL DO ESTOQUE</Text>
+              <Text style={s.resumoValor}>
+                {brl(valorTotalEstoque)}
+              </Text>
+            </View>
+          ) : null
+        }
         renderItem={({ item: p }) => {
           const baixo = p.quantidade <= p.minimo;
           return (
@@ -127,6 +142,9 @@ export default function Produtos() {
                 <View style={{ alignItems: 'flex-end' }}>
                   <Text style={[s.qtd, baixo && { color: cores.warn }]}>{p.quantidade}{baixo ? ' ⚠️' : ''}</Text>
                   {isAdmin && <Text style={s.sub}>{brl(p.preco)}</Text>}
+                  {isAdmin && (
+                    <Text style={s.valorProduto}>Total: {brl(Number(p.quantidade) * Number(p.preco))}</Text>
+                  )}
                 </View>
               </View>
               <View style={s.acoes}>
@@ -184,4 +202,8 @@ const criarEstilos = (cores) => StyleSheet.create({
   sub: { fontSize: 13, color: cores.muted },
   qtd: { fontSize: 20, fontWeight: '700', color: cores.text },
   acoes: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
+  resumo: { backgroundColor: cores.card, borderRadius: 8, borderWidth: 1, borderColor: cores.border, padding: 12, marginTop: 4, gap: 3 },
+  resumoLabel: { fontSize: 11, fontWeight: '600', color: cores.muted },
+  resumoValor: { fontSize: 19, fontWeight: '700', color: cores.text },
+  valorProduto: { fontSize: 12, fontWeight: '600', color: cores.muted, marginTop: 2 },
 });
