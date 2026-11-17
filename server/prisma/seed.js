@@ -17,9 +17,14 @@ async function main() {
   }
 
   const produtos = [
-    { nome: 'Mouse USB', sku: 'MOU-001', categoria: 'Periféricos', quantidade: 25, minimo: 5, preco: 39.9 },
-    { nome: 'Teclado ABNT2', sku: 'TEC-001', categoria: 'Periféricos', quantidade: 3, minimo: 5, preco: 89.9 },
-    { nome: 'Cabo HDMI 2m', sku: 'CAB-002', categoria: 'Cabos', quantidade: 40, minimo: 10, preco: 24.5 },
+    { nome: 'Vestido Floral Midi M', sku: 'VES-001', categoria: 'Vestidos', quantidade: 18, minimo: 5, preco: 149.9 },
+    { nome: 'Blusa de Alfaiataria P', sku: 'BLU-001', categoria: 'Blusas', quantidade: 4, minimo: 5, preco: 99.9 },
+    { nome: 'Calça Wide Leg G', sku: 'CAL-001', categoria: 'Calças', quantidade: 22, minimo: 6, preco: 179.9 },
+    { nome: 'Saia Plissada M', sku: 'SAI-001', categoria: 'Saias', quantidade: 15, minimo: 5, preco: 119.9 },
+    { nome: 'Jaqueta Jeans P', sku: 'JAQ-001', categoria: 'Jaquetas', quantidade: 9, minimo: 4, preco: 229.9 },
+    { nome: 'Conjunto Cropped e Shorts P', sku: 'CON-001', categoria: 'Conjuntos', quantidade: 12, minimo: 5, preco: 159.9 },
+    { nome: 'Macacão Pantalona M', sku: 'MAC-001', categoria: 'Macacões', quantidade: 7, minimo: 4, preco: 199.9 },
+    { nome: 'Cardigã Tricot G', sku: 'CAR-001', categoria: 'Tricot', quantidade: 20, minimo: 6, preco: 139.9 },
   ];
   for (const p of produtos) {
     await prisma.produto.upsert({ where: { sku: p.sku }, update: {}, create: p });
