@@ -44,8 +44,7 @@ export function Campo({ label, style, ...props }) {
   );
 }
 
-// Dropdown nativo pra escolher 1 de uma lista fixa (ex.: tamanho).
-// opcoes: ['PP', 'P', ...] ou [{ valor: 'PP', label: 'PP' }, ...]
+// opcoes aceita string[] ou { valor, label }[]
 export function Seletor({ label, valor, onAlterar, opcoes, placeholder = 'Selecione...' }) {
   const { cores } = useTheme();
   const s = useMemo(() => criarEstilos(cores), [cores]);

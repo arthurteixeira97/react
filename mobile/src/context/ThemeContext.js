@@ -1,8 +1,7 @@
 import { createContext, useContext, useMemo } from 'react';
 import { useColorScheme } from 'react-native';
 
-// Paleta clara (padrão) e escura. Mesmas chaves nas duas — quem usa
-// `cores.xxx` não precisa saber em qual modo o app está.
+// Mesmas chaves nas duas paletas, pra quem usa `cores.xxx` não precisar saber o modo.
 export const paletaClara = {
   bg: '#f4f5f7', card: '#ffffff', text: '#1f2933', muted: '#6b7280', border: '#e5e7eb',
   primary: '#2563eb', ok: '#16a34a', warn: '#d97706', danger: '#dc2626',

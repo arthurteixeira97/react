@@ -34,9 +34,7 @@ export function AuthProvider({ children }) {
     setModoUsuario((v) => !v);
   }
 
-  // isAdminReal: perfil de fato cadastrado no backend (garante a permissão de verdade).
-  // isAdmin: o que a tela usa pra decidir o que mostrar — some quando o admin liga o
-  // "modo usuário padrão", pra ele navegar no app igual a um usuário comum veria.
+  // isAdmin some durante o "modo usuário padrão"; isAdminReal não.
   const isAdminReal = user?.perfil === 'admin';
   const isAdmin = isAdminReal && !modoUsuario;
 

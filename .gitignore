@@ -33,3 +33,4 @@ yarn-error.*
 .DS_Store
 .vscode/
 *.pem
+.claude/
