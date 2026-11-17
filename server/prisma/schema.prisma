@@ -20,11 +20,20 @@ model Usuario {
   movimentacoes Movimentacao[]
 }
 
+enum Tamanho {
+  PP
+  P
+  M
+  G
+  GG
+}
+
 model Produto {
   id            Int            @id @default(autoincrement())
   nome          String
   sku           String         @unique
   categoria     String?
+  tamanho       Tamanho?
   quantidade    Int            @default(0)
   minimo        Int            @default(0)
   preco         Decimal        @default(0)

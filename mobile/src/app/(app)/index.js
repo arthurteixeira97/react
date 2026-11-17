@@ -4,9 +4,10 @@ import { useFocusEffect } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import * as api from '../../services/api';
-import { Botao, Campo, Erro, Folha, Vazio } from '../../components/ui';
+import { Botao, Campo, Erro, Folha, Seletor, Vazio } from '../../components/ui';
 
-const VAZIO = { nome: '', sku: '', categoria: '', quantidade: '0', minimo: '0', preco: '0' };
+const TAMANHOS = ['PP', 'P', 'M', 'G', 'GG'];
+const VAZIO = { nome: '', sku: '', categoria: '', tamanho: '', quantidade: '0', minimo: '0', preco: '0' };
 const brl = (v) => `R$ ${Number(v).toFixed(2).replace('.', ',')}`;
 const num = (v) => Number(String(v).replace(',', '.'));
 
@@ -49,7 +50,7 @@ export default function Produtos() {
   function abrirForm(p) {
     setErro('');
     setForm(p
-      ? { ...p, categoria: p.categoria ?? '', quantidade: String(p.quantidade), minimo: String(p.minimo), preco: String(p.preco) }
+      ? { ...p, categoria: p.categoria ?? '', tamanho: p.tamanho ?? '', quantidade: String(p.quantidade), minimo: String(p.minimo), preco: String(p.preco) }
       : VAZIO);
   }
 
@@ -137,7 +138,9 @@ export default function Produtos() {
               <View style={s.linha}>
                 <View style={{ flex: 1 }}>
                   <Text style={s.nome}>{p.nome}</Text>
-                  <Text style={s.sub}>{p.sku}{p.categoria ? ` · ${p.categoria}` : ''}</Text>
+                  <Text style={s.sub}>
+                    {p.sku}{p.categoria ? ` · ${p.categoria}` : ''}{p.tamanho ? ` · Tam. ${p.tamanho}` : ''}
+                  </Text>
                 </View>
                 <View style={{ alignItems: 'flex-end' }}>
                   <Text style={[s.qtd, baixo && { color: cores.warn }]}>{p.quantidade}{baixo ? ' ⚠️' : ''}</Text>
@@ -167,6 +170,13 @@ export default function Produtos() {
         <Campo label="Nome" {...campo('nome')} />
         <Campo label="SKU" autoCapitalize="characters" {...campo('sku')} />
         <Campo label="Categoria" {...campo('categoria')} />
+        <Seletor
+          label="Tamanho"
+          valor={form?.tamanho}
+          onAlterar={(v) => setForm({ ...form, tamanho: v })}
+          opcoes={TAMANHOS}
+          placeholder="Sem tamanho"
+        />
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <Campo label="Quantidade" keyboardType="number-pad" style={{ flex: 1 }} {...campo('quantidade')} />
           <Campo label="Mínimo" keyboardType="number-pad" style={{ flex: 1 }} {...campo('minimo')} />

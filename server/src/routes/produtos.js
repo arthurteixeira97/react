@@ -10,12 +10,15 @@ const formatar = (p, isAdmin) => {
   return isAdmin ? { ...resto, preco: Number(preco) } : resto;
 };
 
+const TAMANHOS = ['PP', 'P', 'M', 'G', 'GG'];
+
 function validar(body) {
-  const { nome, sku, categoria, quantidade, minimo, preco } = body ?? {};
+  const { nome, sku, categoria, tamanho, quantidade, minimo, preco } = body ?? {};
   if (!nome?.trim() || !sku?.trim()) return { erro: 'Nome e SKU são obrigatórios' };
+  if (tamanho && !TAMANHOS.includes(tamanho)) return { erro: 'Tamanho inválido' };
   const nums = { quantidade: Number(quantidade ?? 0), minimo: Number(minimo ?? 0), preco: Number(preco ?? 0) };
   if (Object.values(nums).some((n) => !Number.isFinite(n) || n < 0)) return { erro: 'Valores numéricos inválidos' };
-  return { dados: { nome: nome.trim(), sku: sku.trim(), categoria: categoria?.trim() || null, ...nums } };
+  return { dados: { nome: nome.trim(), sku: sku.trim(), categoria: categoria?.trim() || null, tamanho: tamanho || null, ...nums } };
 }
 
 // Todos os perfis

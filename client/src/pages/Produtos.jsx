@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import * as api from '../services/api';
 
-const VAZIO = { nome: '', sku: '', categoria: '', quantidade: 0, minimo: 0, preco: 0 };
+const TAMANHOS = ['PP', 'P', 'M', 'G', 'GG'];
+const VAZIO = { nome: '', sku: '', categoria: '', tamanho: '', quantidade: 0, minimo: 0, preco: 0 };
 const brl = (v) => Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
 export default function Produtos() {
@@ -77,7 +78,7 @@ export default function Produtos() {
         <table>
           <thead>
             <tr>
-              <th>SKU</th><th>Nome</th><th>Categoria</th><th>Qtd.</th>
+              <th>SKU</th><th>Nome</th><th>Categoria</th><th>Tamanho</th><th>Qtd.</th>
               {isAdmin && <th>Preço</th>}
               <th></th>
             </tr>
@@ -88,6 +89,7 @@ export default function Produtos() {
                 <td>{p.sku}</td>
                 <td>{p.nome}</td>
                 <td>{p.categoria}</td>
+                <td>{p.tamanho}</td>
                 <td>{p.quantidade}{p.quantidade <= p.minimo && ' ⚠️'}</td>
                 {isAdmin && <td>{brl(p.preco)}</td>}
                 <td className="row-actions">
@@ -102,7 +104,7 @@ export default function Produtos() {
                 </td>
               </tr>
             ))}
-            {!filtrados.length && <tr><td colSpan={6} className="vazio">Nenhum produto</td></tr>}
+            {!filtrados.length && <tr><td colSpan={7} className="vazio">Nenhum produto</td></tr>}
           </tbody>
         </table>
       </div>
@@ -115,6 +117,12 @@ export default function Produtos() {
             <label>Nome<input required {...campo('nome')} /></label>
             <label>SKU<input required {...campo('sku')} /></label>
             <label>Categoria<input {...campo('categoria')} /></label>
+            <label>Tamanho
+              <select {...campo('tamanho')}>
+                <option value="">Sem tamanho</option>
+                {TAMANHOS.map((t) => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </label>
             <div className="grid3">
               <label>Quantidade<input type="number" min="0" {...campo('quantidade')} /></label>
               <label>Mínimo<input type="number" min="0" {...campo('minimo')} /></label>

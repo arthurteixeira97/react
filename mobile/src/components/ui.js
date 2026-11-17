@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { ActivityIndicator, Modal, Pressable, Text, TextInput, View, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { useTheme, paletaClara } from '../context/ThemeContext';
 
 // Mantido por compatibilidade (ex.: uso fora de componente). Dentro de
@@ -39,6 +40,27 @@ export function Campo({ label, style, ...props }) {
     <View style={{ gap: 4, ...style }}>
       {label && <Text style={s.label}>{label}</Text>}
       <TextInput style={s.input} placeholderTextColor={cores.muted} {...props} />
+    </View>
+  );
+}
+
+// Dropdown nativo pra escolher 1 de uma lista fixa (ex.: tamanho).
+// opcoes: ['PP', 'P', ...] ou [{ valor: 'PP', label: 'PP' }, ...]
+export function Seletor({ label, valor, onAlterar, opcoes, placeholder = 'Selecione...' }) {
+  const { cores } = useTheme();
+  const s = useMemo(() => criarEstilos(cores), [cores]);
+  return (
+    <View style={{ gap: 4 }}>
+      {label && <Text style={s.label}>{label}</Text>}
+      <View style={s.seletorBox}>
+        <Picker selectedValue={valor ?? ''} onValueChange={onAlterar} dropdownIconColor={cores.text} style={s.seletor}>
+          <Picker.Item label={placeholder} value="" color={cores.muted} />
+          {opcoes.map((o) => {
+            const item = typeof o === 'string' ? { valor: o, label: o } : o;
+            return <Picker.Item key={item.valor} label={item.label} value={item.valor} color={cores.text} />;
+          })}
+        </Picker>
+      </View>
     </View>
   );
 }
@@ -88,6 +110,8 @@ const criarEstilos = (cores) => ({
   botaoTexto: { fontSize: 15, fontWeight: '600' },
   label: { fontSize: 13, color: cores.muted },
   input: { borderWidth: 1, borderColor: cores.border, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, backgroundColor: cores.card, color: cores.text },
+  seletorBox: { borderWidth: 1, borderColor: cores.border, borderRadius: 8, backgroundColor: cores.card, justifyContent: 'center', overflow: 'hidden' },
+  seletor: { color: cores.text, ...(Platform.OS === 'android' ? { height: 46 } : {}) },
   badge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 99, backgroundColor: cores.border, alignSelf: 'flex-start' },
   badgeTexto: { fontSize: 12, color: cores.text },
   modalBg: { flex: 1 },
