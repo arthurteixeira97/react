@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Estoque",
+    "name": "StockUP",
     "slug": "estoque",
     "scheme": "estoque",
     "version": "1.0.0",
@@ -47,6 +47,17 @@
           }
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "1a5e082e-b20b-442a-8519-62e8c4a1afe2"
+      }
+    },
+    "owner": "arthur.teixeira"
   }
 }

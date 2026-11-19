@@ -3,12 +3,13 @@ import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-na
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { BASE_URL } from '../services/api';
+import { useApiUrl } from '../services/api';
 import { Botao, Campo, Erro } from '../components/ui';
 
 export default function Login() {
   const { login } = useAuth();
   const { cores } = useTheme();
+  const apiUrl = useApiUrl();
   const s = useMemo(() => criarEstilos(cores), [cores]);
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -46,7 +47,7 @@ export default function Login() {
             Padrão: user@estoque.com / user123
           </Text>
         </View>
-        <Text style={s.api}>API: {BASE_URL}</Text>
+        <Text style={s.api}>API: {apiUrl || 'procurando servidor na rede...'}</Text>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

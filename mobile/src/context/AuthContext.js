@@ -9,9 +9,9 @@ export function AuthProvider({ children }) {
   const [modoUsuario, setModoUsuario] = useState(false); // admin "vendo como" usuário padrão
 
   useEffect(() => {
-    api.carregarSessao()
-      .then(setUser)
-      .catch(() => setUser(null))
+    const minimo = new Promise((resolve) => setTimeout(resolve, 1500));
+
+    Promise.all([api.carregarSessao().then(setUser).catch(() => setUser(null)), minimo])
       .finally(() => setCarregando(false));
 
     // Se a API responder 401 (token expirado), desloga automaticamente

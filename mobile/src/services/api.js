@@ -1,15 +1,97 @@
+import { useEffect, useState } from 'react';
 import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
+import * as Network from 'expo-network';
+
+const PORTA = 3001;
+const IP_CACHE_KEY = 'est_api_host';
 
 // Descobre o endereço da API:
-// 1) EXPO_PUBLIC_API_URL no .env (obrigatório no APK / produção)
-// 2) Em dev no Expo Go: usa o mesmo IP do PC que está rodando o `expo start`, porta 3001
-function resolverBaseUrl() {
+// 1) EXPO_PUBLIC_API_URL no .env, se definido
+// 2) Em dev no Expo Go: usa o mesmo IP do PC que está rodando o `expo start`
+// 3) Num APK (sem hostUri), varre a sub-rede Wi-Fi procurando quem responde em :3001/api/health,
+//    assim o app não fica preso a um IP fixo gravado no build.
+function resolverBaseUrlInicial() {
   if (process.env.EXPO_PUBLIC_API_URL) return process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '');
   const host = Constants.expoConfig?.hostUri?.split(':')[0];
-  return host ? `http://${host}:3001/api` : 'http://localhost:3001/api';
+  return host ? `http://${host}:${PORTA}/api` : null;
 }
-export const BASE_URL = resolverBaseUrl();
+
+let BASE_URL = resolverBaseUrlInicial();
+let prontoPromise = null;
+const ouvintes = [];
+
+function notificar() {
+  ouvintes.forEach((fn) => fn(BASE_URL));
+}
+export function onBaseUrlChange(fn) {
+  ouvintes.push(fn);
+  return () => {
+    const i = ouvintes.indexOf(fn);
+    if (i >= 0) ouvintes.splice(i, 1);
+  };
+}
+export function obterBaseUrl() {
+  return BASE_URL;
+}
+export function useApiUrl() {
+  const [url, setUrl] = useState(BASE_URL);
+  useEffect(() => onBaseUrlChange(setUrl), []);
+  return url;
+}
+
+async function responde(host, timeoutMs) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetch(`http://${host}:${PORTA}/api/health`, { signal: ctrl.signal });
+    return res.ok;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+async function escanearRede() {
+  const meuIp = await Network.getIpAddressAsync().catch(() => null);
+  if (!meuIp || !meuIp.includes('.')) return null;
+  const prefixo = meuIp.split('.').slice(0, 3).join('.');
+
+  const salvo = await SecureStore.getItemAsync(IP_CACHE_KEY).catch(() => null);
+  if (salvo && (await responde(salvo, 1200))) return salvo;
+
+  const hosts = Array.from({ length: 254 }, (_, i) => `${prefixo}.${i + 1}`).filter((h) => h !== salvo);
+  const LOTE = 40;
+  for (let i = 0; i < hosts.length; i += LOTE) {
+    const lote = hosts.slice(i, i + LOTE);
+    // eslint-disable-next-line no-await-in-loop
+    const achado = await Promise.any(
+      lote.map((h) => responde(h, 700).then((ok) => (ok ? h : Promise.reject()))),
+    ).catch(() => null);
+    if (achado) return achado;
+  }
+  return null;
+}
+
+export function inicializarApi() {
+  if (BASE_URL) return Promise.resolve(BASE_URL);
+  if (!prontoPromise) {
+    prontoPromise = escanearRede().then((host) => {
+      if (host) {
+        BASE_URL = `http://${host}:${PORTA}/api`;
+        SecureStore.setItemAsync(IP_CACHE_KEY, host).catch(() => {});
+        notificar();
+      }
+      return BASE_URL;
+    });
+  }
+  return prontoPromise;
+}
+
+// Dispara a descoberta em background assim que o app abre (build standalone sem hostUri),
+// pra já estar pronta quando a tela de login chamar a API.
+if (!BASE_URL) inicializarApi();
 
 const TOKEN_KEY = 'est_token';
 const USER_KEY = 'est_user';
@@ -35,6 +117,9 @@ export async function limparSessao() {
 }
 
 async function request(path, { method = 'GET', body } = {}) {
+  if (!BASE_URL) await inicializarApi();
+  if (!BASE_URL) throw new Error('Não encontrei o servidor na rede. Confira se ele está ligado e no mesmo Wi-Fi.');
+
   let res;
   try {
     res = await fetch(`${BASE_URL}${path}`, {
