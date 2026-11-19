@@ -1,4 +1,4 @@
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Image, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { AuthProvider, useAuth } from '../context/AuthContext';
@@ -9,8 +9,15 @@ function RootNavigator() {
   const { cores } = useTheme();
 
   if (carregando) {
+    // Splash em JS: aparece no Expo Go, onde a splash nativa do app.json não entra em ação
+    // (ela só é aplicada num build de verdade, não no cliente genérico do Expo Go).
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: cores.bg }}>
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: cores.bg, gap: 20 }}>
+        <Image
+          source={require('../../assets/splash-icon.png')}
+          style={{ width: 140, height: 140 }}
+          resizeMode="contain"
+        />
         <ActivityIndicator size="large" color={cores.primary} />
       </View>
     );
