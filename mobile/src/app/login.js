@@ -33,7 +33,7 @@ export default function Login() {
     <SafeAreaView style={{ flex: 1, backgroundColor: cores.bg }}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={s.container}>
         <View style={s.card}>
-          <Text style={s.titulo}>📦 Controle de Estoque</Text>
+          <Text style={s.titulo}>📦 StockUP </Text>
           <Campo
             label="E-mail" value={email} onChangeText={setEmail}
             autoCapitalize="none" keyboardType="email-address" autoComplete="email"
